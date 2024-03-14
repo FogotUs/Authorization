@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: "nginx:stable-alpine"
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker-compose/nginx/lara.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./auth:/var/www/laravel
+    depends_on:
+      - mysql
+      - php
+  php:
+    build:
+      context: dockerfiles/php8.3-fpm
+      dockerfile: Dockerfile
+    volumes:
+      - ./auth:/var/www/laravel
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3316:3306"
+    environment:
+      - MYSQL_DATABASE=laravel_db
+      - MYSQL_USER=laravel
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - ./db_data:/var/lib/mysql
